@@ -198,7 +198,7 @@ custom:
     weekday_17_collect:
       name: "工作日晚间采集"
       start: "17:00"
-      end: "17:30"
+      end: "17:29"
       collect: true
       analyze: false
       push: false
