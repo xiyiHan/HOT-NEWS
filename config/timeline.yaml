@@ -430,39 +430,86 @@ custom:
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   periods:
 
-    deep_quiet:
-      name: "深夜静默"
-      start: "23:00"
-      end: "06:00"                 # 23:00 → 次日 06:00（跨日时间段）
-      collect: true                # 夜间继续采集数据
-      analyze: true                # 夜间可以跑 AI 分析（反正不推送）
-      push: false                  # 深夜不推送，避免打扰
 
-    weekday_morning:
-      name: "工作日早间"
-      start: "08:00"
-      end: "10:00"                 # 跨度 2h，留足触发裕量
-      push: true                   # 早上推送一次
-      report_mode: "incremental"   # 只推新增内容
-      # once 继承 default（push: true）→ 窗口内只推一次
 
-    weekend_morning:
-      name: "周末早间"
-      start: "10:00"
-      end: "12:00"                 # 跨度 2h
-      push: true
-      report_mode: "daily"         # 周末看全天汇总
-      # once 继承 default（push: true）→ 窗口内只推一次
+      # ─────────────────────────────────────────────────────────
+      # 工作日时间段定义
+      # ─────────────────────────────────────────────────────────
 
-    evening_summary:
-      name: "晚间汇总"
-      start: "19:00"
-      end: "21:00"
-      analyze: true                # 晚间做 AI 分析
-      ai_mode: "daily"             # AI 也分析全天内容
-      push: true                   # 晚间推送
-      report_mode: "daily"         # 当日全部新闻汇总
-      # once 继承 default（analyze: true, push: true）→ 只分析/推送一次
+      # 工作日早上9点采集（只采集，不分析不推送）
+      weekday_09_collect:
+        name: "工作日早间采集"
+        start: "09:00"
+        end: "09:30"                 # 30分钟窗口
+        collect: true
+        analyze: false
+        push: false
+
+      # 工作日中午12点采集（只采集，不分析不推送）
+      weekday_12_collect:
+        name: "工作日午间采集"
+        start: "12:00"
+        end: "12:30"
+        collect: true
+        analyze: false
+        push: false
+
+      # 工作日下午17点采集（只采集，不分析不推送）
+      # 注意：17:30结束，与下面的分析推送时段衔接但不重叠
+      weekday_17_collect:
+        name: "工作日晚间采集"
+        start: "17:00"
+        end: "17:30"                 # ← 17:30结束，不重叠
+        collect: true
+        analyze: false
+        push: false
+
+      # 工作日17:30-19:00分析推送（核心推送时段）
+      # 注意：17:30开始，与上面的采集时段衔接但不重叠
+      weekday_analyze_push:
+        name: "工作日分析推送"
+        start: "17:30"               # ← 17:30开始，不重叠
+        end: "19:00"                 # 1.5小时窗口
+        collect: true                # 继续采集
+        analyze: true                # 开启AI分析
+        ai_mode: "daily"             # 分析全天内容
+        push: true                   # 开启推送
+        report_mode: "daily"         # 推送当日汇总
+        once:
+          analyze: true              # 窗口内只分析一次
+          push: true                 # 窗口内只推送一次
+
+      # ─────────────────────────────────────────────────────────
+      # 周末时间段定义
+      # ─────────────────────────────────────────────────────────
+
+      # 周末下午15:00-15:30采集+分析+推送
+      weekend_15_push:
+        name: "周末下午推送"
+        start: "15:00"
+        end: "15:30"
+        collect: true
+        analyze: true
+        ai_mode: "current"           # 分析当前榜单
+        push: true
+        report_mode: "current"       # 推送当前榜单
+        once:
+          analyze: true
+          push: true
+
+      # 周末晚上19:00-19:30采集+分析+推送
+      weekend_19_push:
+        name: "周末晚间推送"
+        start: "19:00"
+        end: "19:30"
+        collect: true
+        analyze: true
+        ai_mode: "daily"             # 分析全天内容
+        push: true
+        report_mode: "daily"           # 推送当日汇总
+        once:
+          analyze: true
+          push: true
 
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -472,11 +519,14 @@ custom:
   # 你可以定义多个日计划（如 workday 和 weekend），
   # 然后在第 3 步的 week_map 中分配给不同的星期。
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  day_plans:
-    workday:                       # 工作日计划
-      periods: ["deep_quiet", "weekday_morning", "evening_summary"]
-    weekend:                       # 周末计划（用 weekend_morning 替换 weekday_morning）
-      periods: ["deep_quiet", "weekend_morning", "evening_summary"]
+    day_plans:
+      # 工作日计划：9点、12点、17点采集 → 17-19点分析推送
+      workday:
+        periods: ["weekday_09_collect", "weekday_12_collect", "weekday_17_collect", "weekday_analyze_push"]
+      
+      # 周末计划：15点、19点采集+分析+推送
+      weekend:
+        periods: ["weekend_15_push", "weekend_19_push"]
 
 
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
