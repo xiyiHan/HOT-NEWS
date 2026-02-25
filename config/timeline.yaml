@@ -164,88 +164,98 @@ presets:
       6: "all_day"
       7: "all_day"
 
-  custom:
-    name: "自定义"
-    description: "工作日9/12/17点采集，17:30-19点分析推送；周末15/19点采集分析推送。"
-    default:
+custom:
+  name: "自定义"
+  description: "工作日9/12/17点采集，17:30-19点分析推送；周末15/19点采集分析推送。"
+  
+  default:
+    collect: true
+    analyze: false
+    ai_mode: "current"
+    push: false
+    report_mode: "current"
+    once:
+      analyze: true
+      push: true
+  
+  periods:
+    weekday_09_collect:
+      name: "工作日早间采集"
+      start: "09:00"
+      end: "09:30"
       collect: true
       analyze: false
-      ai_mode: "current"
       push: false
+    
+    weekday_12_collect:
+      name: "工作日午间采集"
+      start: "12:00"
+      end: "12:30"
+      collect: true
+      analyze: false
+      push: false
+    
+    weekday_17_collect:
+      name: "工作日晚间采集"
+      start: "17:00"
+      end: "17:30"
+      collect: true
+      analyze: false
+      push: false
+    
+    weekday_analyze_push:
+      name: "工作日分析推送"
+      start: "17:30"
+      end: "19:00"
+      collect: true
+      analyze: true
+      ai_mode: "daily"
+      push: true
+      report_mode: "daily"
+      once:
+        analyze: true
+        push: true
+    
+    weekend_15_push:
+      name: "周末下午推送"
+      start: "15:00"
+      end: "15:30"
+      collect: true
+      analyze: true
+      ai_mode: "current"
+      push: true
       report_mode: "current"
       once:
         analyze: true
         push: true
-    periods:
-      weekday_09_collect:
-        name: "工作日早间采集"
-        start: "09:00"
-        end: "09:30"
-        collect: true
-        analyze: false
-        push: false
-      weekday_12_collect:
-        name: "工作日午间采集"
-        start: "12:00"
-        end: "12:30"
-        collect: true
-        analyze: false
-        push: false
-      weekday_17_collect:
-        name: "工作日晚间采集"
-        start: "17:00"
-        end: "17:30"
-        collect: true
-        analyze: false
-        push: false
-      weekday_analyze_push:
-        name: "工作日分析推送"
-        start: "17:30"
-        end: "19:00"
-        collect: true
+    
+    weekend_19_push:
+      name: "周末晚间推送"
+      start: "19:00"
+      end: "19:30"
+      collect: true
+      analyze: true
+      ai_mode: "daily"
+      push: true
+      report_mode: "daily"
+      once:
         analyze: true
-        ai_mode: "daily"
         push: true
-        report_mode: "daily"
-        once:
-          analyze: true
-          push: true
-      weekend_15_push:
-        name: "周末下午推送"
-        start: "15:00"
-        end: "15:30"
-        collect: true
-        analyze: true
-        ai_mode: "current"
-        push: true
-        report_mode: "current"
-        once:
-          analyze: true
-          push: true
-      weekend_19_push:
-        name: "周末晚间推送"
-        start: "19:00"
-        end: "19:30"
-        collect: true
-        analyze: true
-        ai_mode: "daily"
-        push: true
-        report_mode: "daily"
-        once:
-          analyze: true
-          push: true
-    day_plans:
-      workday:
-        periods: ["weekday_09_collect", "weekday_12_collect", "weekday_17_collect", "weekday_analyze_push"]
-      weekend:
-        periods: ["weekend_15_push", "weekend_19_push"]
-    week_map:
-      1: "workday"
-      2: "workday"
-      3: "workday"
-      4: "workday"
-      5: "workday"
-      6: "weekend"
-      7: "weekend"
-    overlap:
-      policy: "error_on_overlap"
+  
+  day_plans:
+    workday:
+      periods: ["weekday_09_collect", "weekday_12_collect", "weekday_17_collect", "weekday_analyze_push"]
+    weekend:
+      periods: ["weekend_15_push", "weekend_19_push"]
+  
+  week_map:
+    1: "workday"
+    2: "workday"
+    3: "workday"
+    4: "workday"
+    5: "workday"
+    6: "weekend"
+    7: "weekend"
+  
+  overlap:
+    policy: "error_on_overlap"
