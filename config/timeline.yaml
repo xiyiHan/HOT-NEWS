@@ -206,7 +206,7 @@ custom:
     weekday_analyze_push:
       name: "工作日分析推送"
       start: "17:30"
-      end: "19:00"
+      end: "19:30"
       collect: true
       analyze: true
       ai_mode: "daily"
